@@ -1,0 +1,27 @@
+{
+  "name": "customersupportagent",
+  "version": "1.0.0",
+  "description": "This is the backend service for the **CustomerSupportAgent** — an AI-powered customer support solution using Node.js, Express, and MongoDB Atlas. It is designed to serve API responses to an AI agent built on GPT-4o using OpenAI Agent Builder.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LilSarkay/CustomerSupportAgent.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/LilSarkay/CustomerSupportAgent/issues"
+  },
+  "homepage": "https://github.com/LilSarkay/CustomerSupportAgent#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^17.0.1",
+    "express": "^5.1.0",
+    "mongoose": "^8.16.1"
+  }
+}
