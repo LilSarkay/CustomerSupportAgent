@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const session = require('express-session');
+const MongoStore = require('connect-mongo');
 require('dotenv').config();
 
 const app = express();
@@ -11,24 +12,32 @@ const Escalation = require('./models/Escalation');
 
 app.use(cors());
 app.use(express.json());
+
+// ✅ MongoDB-backed sessions (safe for production)
 app.use(session({
   secret: 'phronetic-secret',
   resave: false,
-  saveUninitialized: true
+  saveUninitialized: false,
+  store: MongoStore.create({
+    mongoUrl: process.env.MONGO_URI,
+    ttl: 14 * 24 * 60 * 60 // 14 days
+  })
 }));
 
+// ✅ Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('✅ Connected to MongoDB Atlas'))
   .catch(err => console.error('❌ MongoDB connection error:', err));
 
-// Routes
-app.use('/api/user', require('./routes/user'));
+// ❌ Removed broken route
+// app.use('/api/user', require('./routes/user'));
+
 app.use('/api/issues', require('./routes/issues'));
 app.use('/api/help', require('./routes/help'));
 app.use('/api/feedback', require('./routes/feedback'));
 app.use('/api/escalate', require('./routes/escalate'));
 
-// Dashboard
+// ✅ Dashboard
 app.get('/', async (req, res) => {
   try {
     const issues = await Issue.find().lean();
