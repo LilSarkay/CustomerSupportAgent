@@ -32,7 +32,6 @@ router.post('/', async (req, res) => {
 
     // Save escalation info
     const record = await Escalation.create({
-      userId: user_id,
       userEmail: user_email,
       ticketId: ticket_id,
       escalationReason: escalation_reason,
@@ -44,7 +43,7 @@ router.post('/', async (req, res) => {
     await transporter.sendMail({
       from: process.env.ESCALATION_EMAIL,
       to: assignedEmployee,
-      subject: `🚨 New Escalated Ticket #${ticket_id}`,
+      subject: `New Escalated Ticket #${ticket_id}`,
       text: `
         A new issue has been escalated:
         Ticket ID: ${ticket_id}

@@ -3,12 +3,12 @@ const router = express.Router();
 const Issue = require('../models/Issue');
 
 router.post('/', async (req, res) => {
-  const { userId, issue_description } = req.body;
+  const { ticketId, issue_description } = req.body;
   try {
     const issue = new Issue({
-      userId,
+      ticketId,
       description: issue_description,
-      assignedAgent: 'support@rediff.com'
+      assignedAgent: 'support@phronetic.ai'
     });
     await issue.save();
     res.json({

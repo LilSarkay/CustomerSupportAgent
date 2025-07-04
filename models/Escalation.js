@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 
 const EscalationSchema = new mongoose.Schema({
-  userId: String,
   userEmail: String,
   ticketId: String,
   escalationReason: String,

@@ -3,9 +3,9 @@ const router = express.Router();
 const Feedback = require('../models/Feedback');
 
 router.post('/', async (req, res) => {
-  const { user_id, ticket_id, rating, comment } = req.body;
+  const { ticket_id, rating, comment } = req.body;
   try {
-    const feedback = new Feedback({ userId: user_id, ticketId: ticket_id, rating, comment });
+    const feedback = new Feedback({ ticketId: ticket_id, rating, comment });
     await feedback.save();
     res.json({ feedback_received: true });
   } catch (err) {
