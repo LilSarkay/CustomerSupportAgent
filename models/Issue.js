@@ -1,10 +1,10 @@
 const mongoose = require('mongoose');
 
-const IssueSchema = new mongoose.Schema({
-  description: String,
+const issueSchema = new mongoose.Schema({
+  userEmail: { type: String, required: true },
+  description: { type: String, required: true },
   status: { type: String, default: 'open' },
-  assignedAgent: String,
-  createdAt: { type: Date, default: Date.now }
-});
+  assignedAgent: { type: String, default: 'support@phronetic.ai' }
+}, { timestamps: true });
 
-module.exports = mongoose.model('Issue', IssueSchema);
+module.exports = mongoose.model('Issue', issueSchema);

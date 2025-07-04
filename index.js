@@ -23,7 +23,7 @@ app.use('/api/help', require('./routes/help'));
 app.use('/api/feedback', require('./routes/feedback'));
 app.use('/api/escalate', require('./routes/escalate'));
 
-// ✅ Dashboard with close + delete buttons
+// ✅ Dashboard with proper userEmail rendering
 app.get('/', async (req, res) => {
   try {
     const issues = await Issue.find().lean();
@@ -127,7 +127,7 @@ app.get('/', async (req, res) => {
 
     res.send(html);
   } catch (err) {
-    console.error("❌ Dashboard error:", err);
+    console.error("❌ Dashboard render error:", err);
     res.status(500).send("Dashboard unavailable.");
   }
 });
