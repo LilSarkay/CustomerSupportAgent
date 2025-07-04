@@ -38,7 +38,7 @@ app.get('/', async (req, res) => {
         h2, h3 { color: #333; }
       </style>
       </head><body>
-      <h2>🧠 CustomerSupportAgent Dashboard</h2>
+      <h2>CustomerSupportAgent Dashboard</h2>
 
       <h3>Open Tickets</h3>
       <table>
@@ -78,12 +78,12 @@ app.get('/', async (req, res) => {
     res.send(html);
   } catch (err) {
     console.error("Dashboard render error:", err);
-    res.status(500).send("⚠️ Dashboard unavailable. Please try again later.");
+    res.status(500).send("Dashboard unavailable. Please try again later.");
   }
 });
 
 // ✅ Start server
 const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
