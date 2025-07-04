@@ -1,0 +1,21 @@
+Rediff Knowledge Base – Placeholder Topics
+
+1. How to Reset Your Password
+If you've forgotten your password, go to the Rediff login page and click "Forgot Password." Follow the instructions to receive a reset link via email.
+
+2. Email Configuration on Mobile Devices
+To set up your Rediffmail account on Android or iOS, use the following IMAP settings:
+IMAP Server: imap.rediffmail.com
+SMTP Server: smtp.rediffmail.com
+Port: 993 for IMAP, 465 for SMTP (SSL)
+
+3. Inbox Not Loading Properly
+Clear your browser cache and cookies. Try accessing your inbox in incognito mode or using a different browser.
+
+4. Attachments Not Uploading
+Ensure your file size is below 25MB. Try converting the file to .zip or .pdf format before uploading.
+
+5. Deleting or Recovering Emails
+Deleted emails go to Trash for 30 days. After that, they are permanently deleted. Check your Trash folder to recover emails.
+
+More entries will be added when the full Rediff documentation is provided.

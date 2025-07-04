@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const session = require('express-session');
 require('dotenv').config();
 
 const app = express();
@@ -10,20 +11,24 @@ const Escalation = require('./models/Escalation');
 
 app.use(cors());
 app.use(express.json());
+app.use(session({
+  secret: 'phronetic-secret',
+  resave: false,
+  saveUninitialized: true
+}));
 
-// ✅ MongoDB Connection
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('✅ Connected to MongoDB Atlas'))
   .catch(err => console.error('❌ MongoDB connection error:', err));
 
-// ✅ API Routes
+// Routes
 app.use('/api/user', require('./routes/user'));
 app.use('/api/issues', require('./routes/issues'));
 app.use('/api/help', require('./routes/help'));
 app.use('/api/feedback', require('./routes/feedback'));
 app.use('/api/escalate', require('./routes/escalate'));
 
-// ✅ Dashboard with proper userEmail rendering
+// Dashboard
 app.get('/', async (req, res) => {
   try {
     const issues = await Issue.find().lean();
@@ -112,9 +117,9 @@ app.get('/', async (req, res) => {
     escalations.forEach(e => {
       html += `<tr>
         <td>${e.ticketId}</td>
-        <td>${e.userEmail}</td>
+        <td>${e.userEmail || '—'}</td>
         <td>${e.status}</td>
-        <td>${e.assignedEmployee}</td>
+        <td>${e.assignedEmployee || '—'}</td>
       </tr>`;
     });
 
@@ -132,7 +137,6 @@ app.get('/', async (req, res) => {
   }
 });
 
-// ✅ Start server
 const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
