@@ -9,7 +9,7 @@ const TRIGGER_WORDS = ["human", "person", "agent", "talk to", "someone", "speak 
 const employeeEmails = [
   "saanvi.ravikiran@gmail.com",
   "ananya.jason.rajput@gmail.com",
-  "support@phronetic.ai"
+  "support@phronetic.ai",
 ];
 
 const transporter = nodemailer.createTransport({
@@ -20,7 +20,7 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-// ✅ Create new issue (auto-escalates if needed)
+// ✅ Create new issue and escalate if needed
 router.post('/', async (req, res) => {
   const { userEmail, issue_description } = req.body;
 
@@ -81,12 +81,12 @@ Please reach out to the user as soon as possible.
     });
 
   } catch (err) {
-    console.error("❌ Issue creation failed:", err);
+    console.error("❌ Issue creation failed:", err.message);
     res.status(500).json({ error: 'Failed to create issue' });
   }
 });
 
-// ✅ PATCH: Update ticket status
+// ✅ FIXED: Patch route properly defined outside post block
 router.patch('/:ticketId/status', async (req, res) => {
   const { status } = req.body;
   const { ticketId } = req.params;
@@ -111,7 +111,7 @@ router.patch('/:ticketId/status', async (req, res) => {
     });
 
   } catch (err) {
-    console.error("❌ Status update failed:", err);
+    console.error("❌ Status update failed:", err.message);
     res.status(500).json({ error: "Server error while updating status" });
   }
 });
@@ -127,7 +127,7 @@ router.delete('/:ticketId', async (req, res) => {
     res.json({ message: "Ticket deleted successfully", ticket_id: deleted._id });
 
   } catch (err) {
-    console.error("❌ Delete failed:", err);
+    console.error("❌ Delete failed:", err.message);
     res.status(500).json({ error: "Server error while deleting ticket" });
   }
 });
