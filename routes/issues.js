@@ -19,6 +19,12 @@ const transporter = nodemailer.createTransport({
   }
 });
 
+// ✅ GET /api/issues – to confirm backend is live
+router.get('/', (req, res) => {
+  res.json({ message: 'Issues route is live' });
+});
+
+// ✅ POST /api/issues – Create new ticket
 router.post('/', async (req, res) => {
   const sessionEmail = req.session?.user?.email;
   const userEmail = sessionEmail || req.body.userEmail;
@@ -90,4 +96,46 @@ router.post('/', async (req, res) => {
   }
 });
 
-// PATCH and DELETE routes remain unchanged
+// ✅ PATCH /api/issues/:ticketId/status – update status
+router.patch('/:ticketId/status', async (req, res) => {
+  const { status } = req.body;
+  const { ticketId } = req.params;
+
+  if (!["open", "closed", "in_progress", "escalated"].includes(status)) {
+    return res.status(400).json({ error: "Invalid status value" });
+  }
+
+  try {
+    const issue = await Issue.findById(ticketId);
+    if (!issue) return res.status(404).json({ error: "Issue not found" });
+
+    issue.status = status;
+    await issue.save();
+
+    res.json({
+      message: `Ticket ${ticketId} status updated to '${status}'`,
+      ticket_id: issue._id,
+      status: issue.status
+    });
+
+  } catch (err) {
+    console.error("❌ Status update failed:", err.message);
+    res.status(500).json({ error: "Server error while updating status" });
+  }
+});
+
+// ✅ DELETE /api/issues/:ticketId – delete ticket
+router.delete('/:ticketId', async (req, res) => {
+  const { ticketId } = req.params;
+  try {
+    const deleted = await Issue.findByIdAndDelete(ticketId);
+    if (!deleted) return res.status(404).json({ error: "Ticket not found" });
+
+    res.json({ message: `Ticket ${ticketId} deleted successfully.` });
+  } catch (err) {
+    console.error("❌ Deletion failed:", err.message);
+    res.status(500).json({ error: "Failed to delete ticket" });
+  }
+});
+
+module.exports = router;
