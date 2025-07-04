@@ -1,16 +1,20 @@
 const express = require('express');
+const app = express(); // ✅ this must come first
 const mongoose = require('mongoose');
 const cors = require('cors');
 require('dotenv').config();
 
-const Issue = require('./models/Issue');
-const Escalation = require('./models/Escalation');
-
-app.use('/api/issues', require('./routes/issues'));
-
-const app = express();
+// Middleware
 app.use(cors());
 app.use(express.json());
+
+// Routes (use AFTER app is defined)
+app.use('/api/user', require('./routes/user'));
+app.use('/api/issues', require('./routes/issues'));
+app.use('/api/help', require('./routes/help'));
+app.use('/api/feedback', require('./routes/feedback'));
+app.use('/api/escalate', require('./routes/escalate'));
+
 
 // 🔗 Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI)
