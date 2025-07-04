@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 require('dotenv').config();
 
-const app = express(); // ✅ app initialized first
+const app = express();
 
 const Issue = require('./models/Issue');
 const Escalation = require('./models/Escalation');
@@ -23,15 +23,11 @@ app.use('/api/help', require('./routes/help'));
 app.use('/api/feedback', require('./routes/feedback'));
 app.use('/api/escalate', require('./routes/escalate'));
 
-// ✅ Dashboard route
+// ✅ Dashboard with close + delete buttons
 app.get('/', async (req, res) => {
   try {
-    console.log("🔍 Loading dashboard...");
     const issues = await Issue.find().lean();
     const escalations = await Escalation.find().lean();
-
-    console.log("✅ Loaded", issues.length, "issues");
-    console.log("✅ Loaded", escalations.length, "escalations");
 
     let html = `
       <html>
@@ -42,7 +38,7 @@ app.get('/', async (req, res) => {
           table { border-collapse: collapse; width: 100%; margin-bottom: 40px; }
           th, td { padding: 8px 12px; border: 1px solid #ccc; text-align: left; }
           th { background-color: #f9f9f9; }
-          button { padding: 5px 10px; cursor: pointer; }
+          button { padding: 5px 10px; cursor: pointer; margin-right: 5px; }
         </style>
         <script>
           async function closeTicket(ticketId) {
@@ -63,6 +59,23 @@ app.get('/', async (req, res) => {
               alert('❌ Failed to close ticket: ' + (data.error || 'unknown error'));
             }
           }
+
+          async function deleteTicket(ticketId) {
+            const confirmed = confirm("Permanently delete ticket " + ticketId + "?");
+            if (!confirmed) return;
+
+            const response = await fetch('/api/issues/' + ticketId, {
+              method: 'DELETE'
+            });
+
+            const data = await response.json();
+            if (response.ok) {
+              alert('🗑️ Ticket deleted.');
+              location.reload();
+            } else {
+              alert('❌ Failed to delete ticket: ' + (data.error || 'unknown error'));
+            }
+          }
         </script>
       </head>
       <body>
@@ -79,11 +92,12 @@ app.get('/', async (req, res) => {
         <td>${issue.userEmail || '—'}</td>
         <td>${issue.status}</td>
         <td>${issue.assignedAgent || '—'}</td>
-        <td>${
-          issue.status === 'open'
+        <td>
+          ${issue.status === 'open'
             ? `<button onclick="closeTicket('${issue._id}')">Close</button>`
-            : '—'
-        }</td>
+            : '—'}
+          <button onclick="deleteTicket('${issue._id}')">Delete</button>
+        </td>
       </tr>`;
     });
 
@@ -112,15 +126,14 @@ app.get('/', async (req, res) => {
     `;
 
     res.send(html);
-
   } catch (err) {
-    console.error("Dashboard render error:", err);
+    console.error("❌ Dashboard error:", err);
     res.status(500).send("Dashboard unavailable.");
   }
 });
 
-// ✅ Launch server
+// ✅ Start server
 const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => {
-  console.log(`Server is live at http://localhost:${PORT}`);
+  console.log(`🚀 Server running on port ${PORT}`);
 });
