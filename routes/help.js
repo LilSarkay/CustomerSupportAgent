@@ -2,7 +2,12 @@ const express = require('express');
 const router = express.Router();
 const Article = require('../models/Article');
 
-// Simple mock search (can upgrade to vector search later)
+// 🧠 Default GET handler to prevent "must be a function" crash
+router.get('/', (req, res) => {
+  res.json({ message: 'Help route is working!' });
+});
+
+// 🔍 POST /api/help/search – Search help articles by query
 router.post('/search', async (req, res) => {
   const { query } = req.body;
   try {
@@ -25,6 +30,7 @@ router.post('/search', async (req, res) => {
       link: `https://rediff.com/support/articles/${article._id}`
     });
   } catch (err) {
+    console.error('❌ Help search failed:', err.message);
     res.status(500).json({ error: 'Search failed' });
   }
 });
