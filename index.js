@@ -1,38 +1,37 @@
 const express = require('express');
-const app = express(); // ✅ this must come first
 const mongoose = require('mongoose');
 const cors = require('cors');
 require('dotenv').config();
 
-// Middleware
+const app = express(); // ✅ app initialized first
+
+const Issue = require('./models/Issue');
+const Escalation = require('./models/Escalation');
+
 app.use(cors());
 app.use(express.json());
 
-// Routes (use AFTER app is defined)
-app.use('/api/user', require('./routes/user'));
-app.use('/api/issues', require('./routes/issues'));
-app.use('/api/help', require('./routes/help'));
-app.use('/api/feedback', require('./routes/feedback'));
-app.use('/api/escalate', require('./routes/escalate'));
-
-
-// 🔗 Connect to MongoDB
+// ✅ MongoDB Connection
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('✅ Connected to MongoDB Atlas'))
   .catch(err => console.error('❌ MongoDB connection error:', err));
 
-// 🧠 API Routes
+// ✅ API Routes
 app.use('/api/user', require('./routes/user'));
 app.use('/api/issues', require('./routes/issues'));
 app.use('/api/help', require('./routes/help'));
 app.use('/api/feedback', require('./routes/feedback'));
 app.use('/api/escalate', require('./routes/escalate'));
 
-// ✅ Dashboard Route at "/"
+// ✅ Dashboard route
 app.get('/', async (req, res) => {
   try {
+    console.log("🔍 Loading dashboard...");
     const issues = await Issue.find().lean();
     const escalations = await Escalation.find().lean();
+
+    console.log("✅ Loaded", issues.length, "issues");
+    console.log("✅ Loaded", escalations.length, "escalations");
 
     let html = `
       <html>
@@ -56,11 +55,12 @@ app.get('/', async (req, res) => {
               body: JSON.stringify({ status: 'closed' })
             });
 
+            const data = await response.json();
             if (response.ok) {
               alert('✅ Ticket closed.');
               location.reload();
             } else {
-              alert('❌ Failed to close ticket.');
+              alert('❌ Failed to close ticket: ' + (data.error || 'unknown error'));
             }
           }
         </script>
@@ -106,20 +106,21 @@ app.get('/', async (req, res) => {
 
     html += `
         </table>
-        <p style="font-style: italic;">Updated: ${new Date().toLocaleString()}</p>
+        <p style="font-style: italic;">Last updated: ${new Date().toLocaleString()}</p>
       </body>
       </html>
     `;
 
     res.send(html);
+
   } catch (err) {
-    console.error("Dashboard error:", err);
+    console.error("Dashboard render error:", err);
     res.status(500).send("Dashboard unavailable.");
   }
 });
 
-// 🚀 Start Server
+// ✅ Launch server
 const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`Server is live at http://localhost:${PORT}`);
 });
