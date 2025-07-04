@@ -6,6 +6,8 @@ require('dotenv').config();
 const Issue = require('./models/Issue');
 const Escalation = require('./models/Escalation');
 
+app.use('/api/issues', require('./routes/issues'));
+
 const app = express();
 app.use(cors());
 app.use(express.json());
