@@ -8,7 +8,7 @@ const TRIGGER_WORDS = ["human", "person", "agent", "talk to", "someone", "speak 
 const employeeEmails = [
   "saanvi.ravikiran@gmail.com",
   "ananya.jason.rajput@gmail.com",
-  "support@phronetic.ai"
+  "supreeth.ravi@phronetic.ai"
 ];
 
 const transporter = nodemailer.createTransport({
@@ -19,12 +19,12 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-// ✅ GET /api/issues – to confirm backend is live
+// ✅ GET /api/issues – simple route check
 router.get('/', (req, res) => {
   res.json({ message: 'Issues route is live' });
 });
 
-// ✅ POST /api/issues – Create new ticket
+// ✅ POST /api/issues – Create new ticket (and possibly escalate)
 router.post('/', async (req, res) => {
   const sessionEmail = req.session?.user?.email;
   const userEmail = sessionEmail || req.body.userEmail;
@@ -135,6 +135,37 @@ router.delete('/:ticketId', async (req, res) => {
   } catch (err) {
     console.error("❌ Deletion failed:", err.message);
     res.status(500).json({ error: "Failed to delete ticket" });
+  }
+});
+
+// ✅ NEW: GET /api/issues/by-email?email=user@example.com – list all tickets for an email
+router.get('/by-email', async (req, res) => {
+  const email = req.query.email;
+
+  if (!email) {
+    return res.status(400).json({ error: "Missing email query parameter." });
+  }
+
+  try {
+    const issues = await Issue.find({ userEmail: email }).sort({ createdAt: -1 });
+
+    if (!issues.length) {
+      return res.status(404).json({ message: "No tickets found for this email." });
+    }
+
+    const formatted = issues.map(issue => ({
+      ticket_id: issue._id,
+      status: issue.status,
+      description: issue.description,
+      assigned_agent: issue.assignedAgent,
+      created_at: issue.createdAt
+    }));
+
+    res.json({ tickets: formatted });
+
+  } catch (err) {
+    console.error("❌ Failed to fetch tickets by email:", err.message);
+    res.status(500).json({ error: "Server error while retrieving tickets" });
   }
 });
 
